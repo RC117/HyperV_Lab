@@ -20,7 +20,10 @@ Function Remove-VMAndVHD {
             $vmvhds = $VM | Select-Object VMId | Get-VHD
             Stop-VM -VMName $VmName -Force
             Remove-VM -VMName $VmName -Force
-            $vmvhds | ForEach-Object { Remove-Item -Path $_.ParentPath -Recurse -Force -Confirm:$false }
+            $vmvhds | ForEach-Object { 
+                write-host $_.ParentPath
+                Remove-Item -Path $_.ParentPath -Recurse -Force -Confirm:$false 
+            }
         }
     }
     catch {
