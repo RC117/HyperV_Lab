@@ -21,8 +21,7 @@ Function Remove-VMAndVHD {
             Stop-VM -VMName $VmName -Force
             Remove-VM -VMName $VmName -Force
             $vmvhds | ForEach-Object { 
-                write-host $_.ParentPath
-                Remove-Item -Path $_.ParentPath -Recurse -Force -Confirm:$false 
+                Remove-Item -Path $_.Path -Recurse -Force -Confirm:$false 
             }
         }
     }
