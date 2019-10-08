@@ -21,7 +21,7 @@ Function Remove-VMAndVHD {
             Stop-VM -VMName $VmName -Force
             Remove-VM -VMName $VmName -Force
             $vmvhds | ForEach-Object { 
-                Remove-Item -Path $_.Path -Recurse -Force -Confirm:$false 
+                Remove-Item -Path $_.Path -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue
             }
         }
     }
@@ -53,7 +53,8 @@ Function Add-DiffVm {
 
     # Create diff disk
     try {
-        New-VHD -Path $VhdFullPath -ParentPath "$($ParentPath)" -Differencing
+        # TODO: try taking this off? -ErrorAction SilentlyContinue
+        New-VHD -Path $VhdFullPath -ParentPath "$($ParentPath)" -Differencing -ErrorAction SilentlyContinue
     }
     Catch {
         Throw "The Hard disk could not be created"

@@ -10,3 +10,5 @@ Some useful links:-
 * <https://www.red-gate.com/simple-talk/sysadmin/powershell/managing-hyper-v-vms-using-powershell-direct/>
 * <https://www.red-gate.com/simple-talk/sysadmin/powershell/powershell-desired-state-configuration-the-basics/> (use via PS Direct?)
 * <https://www.faqforge.com/powershell/configure-ip-address-using-powershell/>
+* <https://practical365.com/blog/saving-credentials-for-office-365-powershell-scripts-and-scheduled-tasks/>
+* <https://www.petri.com/managing-usernames-passwords-powershell-sharepoint-online>
