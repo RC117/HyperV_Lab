@@ -18,9 +18,15 @@ Function Remove-VMAndVHD {
 
         if ($Null -ne $VM) {
             $vmvhds = $VM | Select-Object VMId | Get-VHD
+
             Stop-VM -VMName $VmName -Force
+            do {
+                $vm = Get-VM -VMName $VmName
+            } while ($vm.Heartbeat -eq "OkApplicationsHealthy")
+            
             Remove-VM -VMName $VmName -Force
             $vmvhds | ForEach-Object { 
+                write-host $_.Path
                 Remove-Item -Path $_.Path -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue
             }
         }
@@ -70,26 +76,35 @@ Function Add-DiffVm {
 
 }
 
-# # Start VM
-# try {
-#     Start-VM -Name Test1
-#     Enable-VMIntegrationService -VMName Test1 -Name "Guest Service Interface"
-#     # Invoke-Command -VMName Test1 -ScriptBlock { (Get-NetAdapter).InterfaceAlias } -Credential $cred
-#     # Get-VM Test1 | Add-VMNetworkAdapter -SwitchName Internet        
-# }
-# catch {
-#     Throw "Could not start VM"
-# }
+<#
+.SYNOPSIS
+Update Ip Address
+#>
+Function Update-IP {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$VmName,
+        [Parameter(Mandatory = $true)]
+        [string]$IpAddress,
+        [Parameter(Mandatory = $true)]
+        [string]$DefaultGateway
+    )
 
+    Write-Host "****** UPDATE-IP *******"
+    Write-Host $IpAddress
+    Write-Host $DefaultGateway
 
+    Enable-VMIntegrationService -VMName $VmName -Name "Guest Service Interface"
 
-# TODO: get network adapter and then change it's ip
-# TODO: Then add "Internet" as new network adapter
+    Start-VM -VMName $VmName
+    do {
+        $vm = Get-VM -VMName $VmName
+    } while ($vm.Heartbeat -ne "OkApplicationsHealthy")
 
-# try {
-#     # Invoke-Command -VMName Test1 -ScriptBlock { (Get-NetAdapter).InterfaceAlias } -Credential $cred
-#     # New-NetIPAddress -InterfaceIndex 2 -IPAddress 192.168.1.10 -PrefixLength 24 -DefaultGateway 192.168.1.1
-# }
-# catch {
-    
-# }
+    $managedCred = Get-StoredCredential -Target MyVMs # Create "Generic credential" in Credential Manager in Windows
+    Invoke-Command -VMName $VmName -ScriptBlock { 
+        # (New-NetIPAddress -IPAddress $args[0] -DefaultGateway $args[1] -PrefixLength 24 -AddressFamily IPv4 -InterfaceIndex (Get-NetAdapter).InterfaceIndex)
+        (New-NetIPAddress -IPAddress $args[0] -PrefixLength 24 -AddressFamily IPv4 -InterfaceIndex (Get-NetAdapter).InterfaceIndex) 
+    } -Credential $managedCred -ArgumentList $IpAddress, $DefaultGateway
+}
