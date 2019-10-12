@@ -2,6 +2,39 @@
 # create a diff disk for each vm
 # create a vm connecting to that new diff disk
 
+
+Function Remove-VMAndVHD2 {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$VmName
+    )
+
+    try {
+        Stop-VM -VMName $VmName -Force
+
+        do {
+            $vmtemp = Get-VM -VMName $VmName
+            $snapshot = Get-VMSnapshot -VMName $VmName
+        } while (($vmtemp.Heartbeat -eq "OkApplicationsHealthy") -and ($Null -ne $snapshot))
+
+        Start-Sleep -second 3
+        write-host "VM stopped"
+        Get-VMSnapshot -VMName $VmName | Remove-VMSnapshot
+        
+        $vhdsPath = Get-VM -VMName $VmName -ErrorAction SilentlyContinue | Select-Object VMId | Get-VHD | Select-Object Path 
+        $vhdsPath | ForEach-Object { 
+            Write-Host $_.Path
+            Remove-Item -Path $_.Path -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue 
+        }
+        
+        Remove-VM -VMName $VmName -Force
+    }
+    catch {
+        Throw "The VM does not exist"
+    }
+}
+
 <#
 .SYNOPSIS
 Removes the VM and attached VHDs
@@ -17,12 +50,19 @@ Function Remove-VMAndVHD {
         $VM = Get-VM -VMName $VmName -ErrorAction SilentlyContinue
 
         if ($Null -ne $VM) {
-            $vmvhds = $VM | Select-Object VMId | Get-VHD
+
 
             Stop-VM -VMName $VmName -Force
+           
             do {
-                $vm = Get-VM -VMName $VmName
-            } while ($vm.Heartbeat -eq "OkApplicationsHealthy")
+                $vmtemp = Get-VM -VMName $VmName
+            } while ($vmtemp.Heartbeat -eq "OkApplicationsHealthy")
+
+            Get-VMSnapshot -VMName $VmName | Remove-VMSnapshot
+            $vmvhds = $VM | Select-Object VMId | Get-VHD
+
+           
+
             
             Remove-VM -VMName $VmName -Force
             $vmvhds | ForEach-Object { 
