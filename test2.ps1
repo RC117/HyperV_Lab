@@ -3,8 +3,8 @@
 $path = "D:\VMs"
 $parentPath = "D:\VMs\Base\Virtual Hard Disks\Base.vhdx"
 # # Remove-VMAndVHD -VmName Test1 - ## DO NOT REMOVE!!!!!! ##
-Remove-VMAndVHD2 -VmName Test2
-# Remove-VMAndVHD -VmName Test3
+Remove-VMAndVHD -VmName Test2
+Remove-VMAndVHD -VmName Test3
 
 # # # Add-DiffVm -VmName Test1 -Path $path -ParentPath $parentPath -SwitchName Lan - ## DO NOT REMOVE!!!!!! ##
 # Add-DiffVm -VmName Test2 -Path $path -ParentPath $parentPath -SwitchName Lan

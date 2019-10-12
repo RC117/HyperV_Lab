@@ -3,7 +3,11 @@
 # create a vm connecting to that new diff disk
 
 
-Function Remove-VMAndVHD2 {
+<#
+.SYNOPSIS
+Removes the VM and attached VHDs
+#>
+Function Remove-VMAndVHD {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -11,6 +15,11 @@ Function Remove-VMAndVHD2 {
     )
 
     try {
+
+        if ($Null -eq (Get-VM -VMName $VmName -ErrorAction SilentlyContinue)) {
+            return
+        }
+
         Stop-VM -VMName $VmName -Force
 
         do {
@@ -35,46 +44,6 @@ Function Remove-VMAndVHD2 {
     }
 }
 
-<#
-.SYNOPSIS
-Removes the VM and attached VHDs
-#>
-Function Remove-VMAndVHD {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$VmName
-    )
-    # Remove VM and it's VHDs
-    try {
-        $VM = Get-VM -VMName $VmName -ErrorAction SilentlyContinue
-
-        if ($Null -ne $VM) {
-
-
-            Stop-VM -VMName $VmName -Force
-           
-            do {
-                $vmtemp = Get-VM -VMName $VmName
-            } while ($vmtemp.Heartbeat -eq "OkApplicationsHealthy")
-
-            Get-VMSnapshot -VMName $VmName | Remove-VMSnapshot
-            $vmvhds = $VM | Select-Object VMId | Get-VHD
-
-           
-
-            
-            Remove-VM -VMName $VmName -Force
-            $vmvhds | ForEach-Object { 
-                write-host $_.Path
-                Remove-Item -Path $_.Path -Recurse -Force -Confirm:$false -ErrorAction SilentlyContinue
-            }
-        }
-    }
-    catch {
-        Throw "The VM does not exist"
-    }
-}
 
 <#
 .SYNOPSIS
