@@ -1,8 +1,3 @@
-# TODO
-# create a diff disk for each vm
-# create a vm connecting to that new diff disk
-
-
 <#
 .SYNOPSIS
 Removes the VM and attached VHDs
