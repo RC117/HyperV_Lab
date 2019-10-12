@@ -7,13 +7,16 @@ Remove-VMAndVHD -VmName Test2
 Remove-VMAndVHD -VmName Test3
 
 # # # Add-DiffVm -VmName Test1 -Path $path -ParentPath $parentPath -SwitchName Lan - ## DO NOT REMOVE!!!!!! ##
-# Add-DiffVm -VmName Test2 -Path $path -ParentPath $parentPath -SwitchName Lan
-# Update-IP -VmName Test2 -IpAddress '169.254.0.102' -DefaultGateway '169.254.0.100'
+$Test2 = 'Test2'
+Add-DiffVm -VmName $Test2 -Path $path -ParentPath $parentPath -SwitchName Lan
+Update-IP -VmName $Test2 -IpAddress '169.254.0.102' -DefaultGateway '169.254.0.100'
+Add-SwitchToVm -VmName $Test2 -SwitchName Internet
 
-# Add-DiffVm -VmName Test3 -Path $path -ParentPath $parentPath -SwitchName Lan
-# Update-IP -VmName Test3 -IpAddress '169.254.0.103' -DefaultGateway '169.254.0.100'
+$Test3 = 'Test3'
+Add-DiffVm -VmName $Test3 -Path $path -ParentPath $parentPath -SwitchName Lan
+Update-IP -VmName $Test3 -IpAddress '169.254.0.103' -DefaultGateway '169.254.0.100'
+Add-SwitchToVm -VmName $Test3 -SwitchName Internet
 
-# add back in "Internet" network to both VMs (might have to stop vm(or restart it afterwards?))
 
 #####################################################################################################
 #####################################################################################################

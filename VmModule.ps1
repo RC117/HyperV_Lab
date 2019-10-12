@@ -113,7 +113,21 @@ Function Update-IP {
 
     $managedCred = Get-StoredCredential -Target MyVMs # Create "Generic credential" in Credential Manager in Windows
     Invoke-Command -VMName $VmName -ScriptBlock { 
-        # (New-NetIPAddress -IPAddress $args[0] -DefaultGateway $args[1] -PrefixLength 24 -AddressFamily IPv4 -InterfaceIndex (Get-NetAdapter).InterfaceIndex)
         (New-NetIPAddress -IPAddress $args[0] -PrefixLength 24 -AddressFamily IPv4 -InterfaceIndex (Get-NetAdapter).InterfaceIndex) 
     } -Credential $managedCred -ArgumentList $IpAddress, $DefaultGateway
+}
+
+<#
+.SYNOPSIS
+Add existing switch to VM
+#>
+Function Add-SwitchToVm {
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$VmName,
+        [Parameter(Mandatory = $true)]
+        [string]$SwitchName
+    )
+    Add-VMNetworkAdapter -VMName $VmName -SwitchName $SwitchName
 }
